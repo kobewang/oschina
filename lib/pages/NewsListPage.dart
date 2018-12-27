@@ -1,39 +1,101 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../widgets/SlideView.dart';
-class NewsListPage extends StatelessWidget {
-  var slideData = [];//轮播图数据
-  var listData = []; //listView列表数据
+import '../util/NetUtils.dart';
+import '../api/api.dart';
+import '../constants/Constants.dart';
+
+class NewsListPage extends StatefulWidget {
+  @override
+  NewsListPageState createState()=> new NewsListPageState();
+}
+
+class NewsListPageState extends State<NewsListPage> {
   TextStyle titleTextStyle = new TextStyle(fontSize: 15.0);//列表资讯标题
   TextStyle subtitleStyle = new TextStyle(color: const Color(0xFFB5BDC0),fontSize: 12.0);
-  NewsListPage() {
-    for (var i = 0;i < 3; i++) {
-      Map map= new Map();
-      map['title']='Python 之父透露退位隐情，与核心开发团队产生隔阂';
-      map['detailUrl']='https://www.oschina.net/news/98455/guido-van-rossum-resigns';
-      map['imgUrl']='https://static.oschina.net/uploads/img/201807/30113144_1SRR.png';
-      slideData.add(map);
-    }
-    for (var i = 0; i < 30; i++) {
-      Map map =  new Map();
-      map['title']='J2Cache 2.3.23 发布，支持 memcached 二级缓存';
-      map['authorImg']='https://static.oschina.net/uploads/user/0/12_50.jpg?t=1421200584000';
-      map['timeStr']='2018-12-26';
-      map['thumb']='https://static.oschina.net/uploads/logo/j2cache_N3NcX.png';
-      map['commCount']=5;
-      listData.add(map);
+  ScrollController _controller = new ScrollController();
+  var slideData = [];//轮播图数据
+  var listData = []; //listView列表数据
+  var listTotalSize = 0;//列表总数
+  var curPage = 1;
+  NewsListPageState() {
+    _controller.addListener(() {
+     var maxScroll = _controller.position.maxScrollExtent; //列表最大滚动距离
+     var pixels = _controller.position.pixels; //当前列表向下滚动的距离
+     if (maxScroll == pixels && listData.length < listTotalSize) {
+       //两个值相等表示滚动到底，但数据还没有加载完，则加载下一页
+       curPage++;
+       getNewsList(true); //获取下一页
+     }
+    });
+  }
 
-    }
+  @override
+  void initState() {
+    super.initState();
+    getNewsList(false);
   }
   @override
   Widget build(BuildContext context) {
-    return new ListView.builder(
-      itemCount: listData.length*2-1,
-      itemBuilder: (context,i) => renderRow(i),
-    );
+    if (listData == null) {
+      return new Center(child: new CircularProgressIndicator());//加载中
+    } else {
+      Widget listView = new  ListView.builder(
+        itemCount: listData.length * 2,
+        itemBuilder: (context, i) => renderRow(i),
+        controller: _controller,//监听滚动
+      );
+      return new RefreshIndicator(child: listView,onRefresh: _pullToRefresh);//增加下拉刷新
+    }      
   }
-  @override
-  //渲染列表Item
+
+  //下拉刷新
+  Future<Null> _pullToRefresh() async {
+    curPage = 1;
+    getNewsList(false);
+    return null;
+  }
+
+  //加载数据
+  getNewsList(bool isLoadingMore) {
+    String url = Api.NEWS_LIST+"?pageIndex=${curPage}&pageSize=10";
+    NetUtils.get(url).then((data) {
+      if (data != null) {
+        var map = json.decode(data);
+        if (map['code'] == 0) {
+          var msg = map['msg'];
+          listTotalSize = msg['news']['total'];
+          var _listData = msg['news']['data'];
+          var _slideData = msg['slide'];
+          setState(() {
+            if(!isLoadingMore) { //首次加载直接赋值
+              listData = _listData;
+              slideData = _slideData;              
+            } else {
+              //翻页加载则追加数据
+              listData.addAll(_listData);
+              if(listData.length >= listTotalSize) { //获取所有，则显示我也是有底线的
+                listData.add(Constants.END_LINE_TAG);
+              }
+              /*
+              List list1 = new List();
+              list1.addAll(listData);
+              list1.addAll(_listData);              
+              if(list1.length >= listTotalSize) { //获取所有，则显示我也是有底线的
+                list1.add(Constants.END_LINE_TAG);
+              }
+              listData = list1;
+              */
+            }
+          });
+        }
+      }
+    });
+  }
+
+   //渲染列表Item
   Widget renderRow(i) {
     if (i ==0) {
       return new Container(
@@ -129,3 +191,36 @@ class NewsListPage extends StatelessWidget {
     );
   }
 }
+/*
+  
+  
+  NewsListPage() {
+    for (var i = 0;i < 3; i++) {
+      Map map= new Map();
+      map['title']='Python 之父透露退位隐情，与核心开发团队产生隔阂';
+      map['detailUrl']='https://www.oschina.net/news/98455/guido-van-rossum-resigns';
+      map['imgUrl']='https://static.oschina.net/uploads/img/201807/30113144_1SRR.png';
+      slideData.add(map);
+    }
+    for (var i = 0; i < 30; i++) {
+      Map map =  new Map();
+      map['title']='J2Cache 2.3.23 发布，支持 memcached 二级缓存';
+      map['authorImg']='https://static.oschina.net/uploads/user/0/12_50.jpg?t=1421200584000';
+      map['timeStr']='2018-12-26';
+      map['thumb']='https://static.oschina.net/uploads/logo/j2cache_N3NcX.png';
+      map['commCount']=5;
+      listData.add(map);
+
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return new ListView.builder(
+      itemCount: listData.length*2-1,
+      itemBuilder: (context,i) => renderRow(i),
+    );
+  }
+  @override
+ 
+}
+*/
