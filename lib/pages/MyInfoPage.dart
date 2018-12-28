@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import './LoginPage.dart';
+import '../util/DataUtils.dart';
 class MyInfoPage extends StatelessWidget {
   List itemList=[
     {
@@ -85,13 +87,20 @@ class MyInfoPage extends StatelessWidget {
   ];
   @override
   Widget build(BuildContext context) {
+    DataUtils.isLogin().then((isLogin){
+      if (isLogin) {
+        print('isLogin:true****');
+      } else {
+        print('isLogin:false****');
+      }
+    });
     var listView = new ListView.builder(
       itemCount: itemList.length,
-      itemBuilder:(context,i) => rederRow(i),
+      itemBuilder:(context,i) => rederRow(context,i),
     );
     return listView;
   }
-  rederRow(i) {
+  rederRow(context,i) {
     var item = itemList[i];
     switch(item['type']) {
       case 'item':
@@ -136,7 +145,10 @@ class MyInfoPage extends StatelessWidget {
         );
         return new GestureDetector(
           onTap: () {
-            print('请登录');
+            //print('请登录');
+            Navigator.push(context, new MaterialPageRoute(
+              builder: (context) => new LoginPage()
+            ));
           },
           child: avatarContainer,
         );

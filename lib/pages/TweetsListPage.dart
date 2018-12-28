@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../util/DataUtils.dart';
 class TweetsListPage extends StatelessWidget {
   List normalTweetsList = [];
   List hotTweetsList = [];
@@ -30,6 +31,7 @@ class TweetsListPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    DataUtils.logout();
     screeenWidth = MediaQuery.of(context).size.width;//获取屏幕高度
     return new DefaultTabController(
       length: 2,

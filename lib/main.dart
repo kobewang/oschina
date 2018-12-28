@@ -5,6 +5,8 @@ import './pages/DiscoveryPage.dart';
 import './pages/TweetsListPage.dart';
 import './pages/MyInfoPage.dart';
 import './widgets/MyDrawer.dart';
+import './pages/SpTest.dart';
+import './pages/PublishPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,8 +37,10 @@ class MyAppState extends State<MyApp> {
      _body = new IndexedStack(    
       children: <Widget>[
         new NewsListPage(),
-        new TweetsListPage(),
-        new DiscoveryPage(),
+        //new TweetsListPage(),
+        new PublishPage(),
+        //new DiscoveryPage(),
+        new SpTest(),
         new MyInfoPage()
       ],
       index: _tabIndex,

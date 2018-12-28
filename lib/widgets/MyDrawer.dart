@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../pages/DiscoveryPage.dart';
+import '../pages/SpTest.dart';
+import '../pages/PublishPage.dart';
 class MyDrawer extends StatelessWidget {
   static const double IMAGE_ICON_WIDTH = 30.0;
   static const double ARROW_ICON_HEIGHT = 16.0;
@@ -64,8 +66,8 @@ class MyDrawer extends StatelessWidget {
         child: listItemContent,
         onTap: (){
           switch(index) {
-            case 0:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new DiscoveryPage(); })); break;
-            case 1:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new DiscoveryPage(); })); break;
+            case 0:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new PublishPage(); })); break;
+            case 1:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new SpTest(); })); break;
             case 2:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new DiscoveryPage(); })); break;
             case 3:Navigator.of(context).push(new MaterialPageRoute(builder: (ctx){ return new DiscoveryPage(); })); break;
           }

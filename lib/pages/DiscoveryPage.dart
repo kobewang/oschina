@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../util/DataUtils.dart';
 
 class DiscoveryPage extends StatelessWidget {
   static const String TAG_START = "startDivider";
@@ -108,6 +109,7 @@ class DiscoveryPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    DataUtils.saveIsLogin();
     return new Padding(
       padding:  const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
       child: new ListView.builder(
